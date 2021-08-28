@@ -6,18 +6,15 @@ This is a template to create your own discord bot in python.
 Version: 2.7
 """
 
-import json
-import os
-import sys
+# import json
+# import os
+# import sys
 
 from discord.ext import commands
+from helpers.json_manager import load_config
 
-# Only if you want to use variables that are in the config.json file.
-if not os.path.isfile("config.json"):
-    sys.exit("'config.json' not found! Please add it and try again.")
-else:
-    with open("config.json") as file:
-        config = json.load(file)
+
+config = load_config()
 
 
 # Here we name the cog and create a new class for the cog.

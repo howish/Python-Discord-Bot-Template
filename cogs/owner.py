@@ -7,22 +7,18 @@ Version: 2.7
 """
 
 import json
-import os
-import sys
 
 import discord
 from discord.ext import commands
 
 from helpers import json_manager
-
-if not os.path.isfile("config.json"):
-    sys.exit("'config.json' not found! Please add it and try again.")
-else:
-    with open("config.json") as file:
-        config = json.load(file)
+from helpers.json_manager import load_config
 
 
-class owner(commands.Cog, name="owner"):
+config = load_config()
+
+
+class Owner(commands.Cog, name="owner"):
     def __init__(self, bot):
         self.bot = bot
 
@@ -90,7 +86,7 @@ class owner(commands.Cog, name="owner"):
                 blacklist = json.load(file)
             embed = discord.Embed(
                 title=f"There are currently {len(blacklist['ids'])} blacklisted IDs",
-                description=f"{', '.join(str(id) for id in blacklist['ids'])}",
+                description=f"{', '.join(str(user_id) for user_id in blacklist['ids'])}",
                 color=0x0000FF
             )
             await context.send(embed=embed)
@@ -101,11 +97,11 @@ class owner(commands.Cog, name="owner"):
         Lets you add a user from not being able to use the bot.
         """
         if context.message.author.id in config["owners"]:
-            userID = member.id
+            user_id = member.id
             try:
                 with open("blacklist.json") as file:
                     blacklist = json.load(file)
-                if (userID in blacklist['ids']):
+                if user_id in blacklist['ids']:
                     embed = discord.Embed(
                         title="Error!",
                         description=f"**{member.name}** is already in the blacklist.",
@@ -113,7 +109,7 @@ class owner(commands.Cog, name="owner"):
                     )
                     await context.send(embed=embed)
                     return
-                json_manager.add_user_to_blacklist(userID)
+                json_manager.add_user_to_blacklist(user_id)
                 embed = discord.Embed(
                     title="User Blacklisted",
                     description=f"**{member.name}** has been successfully added to the blacklist",
@@ -146,9 +142,9 @@ class owner(commands.Cog, name="owner"):
         Lets you remove a user from not being able to use the bot.
         """
         if context.message.author.id in config["owners"]:
-            userID = member.id
+            user_id = member.id
             try:
-                json_manager.remove_user_from_blacklist(userID)
+                json_manager.remove_user_from_blacklist(user_id)
                 embed = discord.Embed(
                     title="User removed from blacklist",
                     description=f"**{member.name}** has been successfully removed from the blacklist",
@@ -177,4 +173,4 @@ class owner(commands.Cog, name="owner"):
 
 
 def setup(bot):
-    bot.add_cog(owner(bot))
+    bot.add_cog(Owner(bot))

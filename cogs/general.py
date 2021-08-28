@@ -7,23 +7,21 @@ Version: 2.7
 """
 
 import json
-import os
+# import os
 import platform
 import random
-import sys
+# import sys
 
 import aiohttp
 import discord
 from discord.ext import commands
-
-if not os.path.isfile("config.json"):
-    sys.exit("'config.json' not found! Please add it and try again.")
-else:
-    with open("config.json") as file:
-        config = json.load(file)
+from helpers.json_manager import load_config
 
 
-class general(commands.Cog, name="general"):
+config = load_config()
+
+
+class General(commands.Cog, name="general"):
     def __init__(self, bot):
         self.bot = bot
 
@@ -86,7 +84,7 @@ class general(commands.Cog, name="general"):
         )
         embed.add_field(
             name="Owner",
-            value=f"{server.owner}\n{server.owner.id}"
+            value=f"{server.Owner}\n{server.Owner.id}"
         )
         embed.add_field(
             name="Server ID",
@@ -127,11 +125,13 @@ class general(commands.Cog, name="general"):
         Get the invite link of the bot to be able to invite it.
         """
         embed = discord.Embed(
-            description=f"Invite me by clicking [here](https://discordapp.com/oauth2/authorize?&client_id={config['application_id']}&scope=bot&permissions=470150263).",
+            description=f"Invite me by clicking [here](https://discordapp.com/oauth2/authorize?&client_id="
+                        f"{config['application_id']}&scope=bot&permissions=470150263).",
             color=0xD75BF4
         )
         try:
-            # To know what permissions to give to your bot, please see here: https://discordapi.com/permissions.html and remember to not give Administrator permissions.
+            # To know what permissions to give to your bot, please see here:
+            # https://discordapi.com/permissions.html and remember to not give Administrator permissions.
             await context.author.send(embed=embed)
             await context.send("I sent you a private message!")
         except discord.Forbidden:
@@ -210,4 +210,4 @@ class general(commands.Cog, name="general"):
 
 
 def setup(bot):
-    bot.add_cog(general(bot))
+    bot.add_cog(General(bot))

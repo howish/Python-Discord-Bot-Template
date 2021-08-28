@@ -12,15 +12,13 @@ import sys
 
 import discord
 from discord.ext import commands
-
-if not os.path.isfile("config.json"):
-    sys.exit("'config.json' not found! Please add it and try again.")
-else:
-    with open("config.json") as file:
-        config = json.load(file)
+from helpers.json_manager import load_config
 
 
-class moderation(commands.Cog, name="moderation"):
+config = load_config()
+
+
+class Moderation(commands.Cog, name="moderation"):
     def __init__(self, bot):
         self.bot = bot
 
@@ -59,7 +57,8 @@ class moderation(commands.Cog, name="moderation"):
             except:
                 embed = discord.Embed(
                     title="Error!",
-                    description="An error occurred while trying to kick the user. Make sure my role is above the role of the user you want to kick.",
+                    description="An error occurred while trying to kick the user. Make sure my role is above the role "
+                                "of the user you want to kick.",
                     color=0xE02B2B
                 )
                 await context.message.channel.send(embed=embed)
@@ -81,7 +80,8 @@ class moderation(commands.Cog, name="moderation"):
         except:
             embed = discord.Embed(
                 title="Error!",
-                description="An error occurred while trying to change the nickname of the user. Make sure my role is above the role of the user you want to change the nickname.",
+                description="An error occurred while trying to change the nickname of the user. Make sure my role is "
+                            "above the role of the user you want to change the nickname.",
                 color=0xE02B2B
             )
             await context.message.channel.send(embed=embed)
@@ -116,7 +116,8 @@ class moderation(commands.Cog, name="moderation"):
         except:
             embed = discord.Embed(
                 title="Error!",
-                description="An error occurred while trying to ban the user. Make sure my role is above the role of the user you want to ban.",
+                description="An error occurred while trying to ban the user. "
+                            "Make sure my role is above the role of the user you want to ban.",
                 color=0xE02B2B
             )
             await context.send(embed=embed)
@@ -176,4 +177,4 @@ class moderation(commands.Cog, name="moderation"):
 
 
 def setup(bot):
-    bot.add_cog(moderation(bot))
+    bot.add_cog(Moderation(bot))

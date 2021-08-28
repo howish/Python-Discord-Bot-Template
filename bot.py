@@ -10,17 +10,15 @@ import json
 import os
 import platform
 import random
-import sys
 
 import discord
 from discord.ext import commands, tasks
 from discord.ext.commands import Bot
+from helpers.json_manager import load_config
 
-if not os.path.isfile("config.json"):
-    sys.exit("'config.json' not found! Please add it and try again.")
-else:
-    with open("config.json") as file:
-        config = json.load(file)
+
+config = load_config()
+
 
 """	
 Setup bot intents (events restrictions)
@@ -97,8 +95,8 @@ async def on_message(message):
     if message.author == bot.user or message.author.bot:
         return
     # Ignores if a command is being executed by a blacklisted user
-    with open("blacklist.json") as file:
-        blacklist = json.load(file)
+    with open("blacklist.json") as f:
+        blacklist = json.load(f)
     if message.author.id in blacklist["ids"]:
         return
     await bot.process_commands(message)
@@ -107,11 +105,11 @@ async def on_message(message):
 # The code in this event is executed every time a command has been *successfully* executed
 @bot.event
 async def on_command_completion(ctx):
-    fullCommandName = ctx.command.qualified_name
-    split = fullCommandName.split(" ")
-    executedCommand = str(split[0])
-    print(
-        f"Executed {executedCommand} command in {ctx.guild.name} (ID: {ctx.message.guild.id}) by {ctx.message.author} (ID: {ctx.message.author.id})")
+    full_command_name = ctx.command.qualified_name
+    split = full_command_name.split(" ")
+    executed_command = str(split[0])
+    print(f"Executed {executed_command} command in {ctx.guild.name} "
+          f"(ID: {ctx.message.guild.id}) by {ctx.message.author} (ID: {ctx.message.author.id})")
 
 
 # The code in this event is executed every time a valid commands catches an error
@@ -123,7 +121,10 @@ async def on_command_error(context, error):
         hours = hours % 24
         embed = discord.Embed(
             title="Hey, please slow down!",
-            description=f"You can use this command again in {f'{round(hours)} hours' if round(hours) > 0 else ''} {f'{round(minutes)} minutes' if round(minutes) > 0 else ''} {f'{round(seconds)} seconds' if round(seconds) > 0 else ''}.",
+            description=f"You can use this command again in "
+                        f"{f'{round(hours)} hours' if round(hours) > 0 else ''} "
+                        f"{f'{round(minutes)} minutes' if round(minutes) > 0 else ''} "
+                        f"{f'{round(seconds)} seconds' if round(seconds) > 0 else ''}.",
             color=0xE02B2B
         )
         await context.send(embed=embed)

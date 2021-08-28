@@ -6,18 +6,12 @@ This is a template to create your own discord bot in python.
 Version: 2.7
 """
 
-import json
-import os
-import sys
-
 import discord
 from discord.ext import commands
+from helpers.json_manager import load_config
 
-if not os.path.isfile("config.json"):
-    sys.exit("'config.json' not found! Please add it and try again.")
-else:
-    with open("config.json") as file:
-        config = json.load(file)
+
+config = load_config()
 
 
 class Help(commands.Cog, name="help"):
@@ -35,10 +29,10 @@ class Help(commands.Cog, name="help"):
         embed = discord.Embed(title="Help", description="List of available commands:", color=0x42F56C)
         for i in self.bot.cogs:
             cog = self.bot.get_cog(i.lower())
-            commands = cog.get_commands()
-            command_list = [command.name for command in commands]
-            command_description = [command.help for command in commands]
-            help_text = '\n'.join(f'{prefix}{n} - {h}' for n, h in zip(command_list, command_description))
+            cog_cmds = cog.get_commands()
+            cog_cmd_list = (cmd.name for cmd in cog_cmds)
+            cog_cmd_description = (cmd.help for cmd in cog_cmds)
+            help_text = '\n'.join(f'{prefix}{n} - {h}' for n, h in zip(cog_cmd_list, cog_cmd_description))
             embed.add_field(name=i.capitalize(), value=f'```{help_text}```', inline=False)
         await context.send(embed=embed)
 
